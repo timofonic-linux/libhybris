@@ -7,7 +7,8 @@ bin_PROGRAMS = \
 	test_sensors \
 	test_input \
 	test_camera \
-	test_gps
+	test_gps \
+	test_surfaceflinger
 
 if HAS_ANDROID_4_2_0
 bin_PROGRAMS += test_hwcomposer
@@ -144,6 +145,17 @@ test_gps_SOURCES = test_gps.c
 test_gps_CFLAGS = -pthread \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/include/android
+
+test_surfaceflinger_SOURCES = test_surfaceflinger.c
+test_surfaceflinger_CFLAGS = \
+	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include/android
+
+test_surfaceflinger_LDADD = \
+	$(top_builddir)/common/libhybris-common.la \
+	$(top_builddir)/surfaceflinger/libsurfaceflinger.la
+
+test_surfaceflinger_LDFLAGS = -lwayland-client
 
 if HAS_ANDROID_4_2_0
 test_gps_CFLAGS += -DHAS_ANDROID_4_2_0

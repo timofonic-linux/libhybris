@@ -1,0 +1,63 @@
+diff --git a/services/surfaceflinger/DisplayHardware/DisplayHardware.cpp b/services/surfaceflinger/DisplayHardware/DisplayHardware.cpp
+index f94d321..e781ec8 100644
+--- a/services/surfaceflinger/DisplayHardware/DisplayHardware.cpp
++++ b/services/surfaceflinger/DisplayHardware/DisplayHardware.cpp
+@@ -42,8 +42,11 @@
+ #include "HWComposer.h"
+ #include "SurfaceFlinger.h"
+ 
+-using namespace android;
++namespace android {
++	void *display_ptr = EGL_DEFAULT_DISPLAY;
++};
+ 
++using namespace android;
+ 
+ static __attribute__((noinline))
+ void checkGLErrors()
+@@ -179,7 +182,7 @@ void DisplayHardware::init(uint32_t dpy)
+     // TODO: all the extensions below should be queried through
+     // eglGetProcAddress().
+ 
+-    EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
++    EGLDisplay display = eglGetDisplay(display_ptr);
+     eglInitialize(display, NULL, NULL);
+     eglGetConfigs(display, NULL, 0, &numConfigs);
+ 
+diff --git a/services/surfaceflinger/SurfaceFlinger.cpp b/services/surfaceflinger/SurfaceFlinger.cpp
+index 24bd2a6..af8f0b1 100644
+--- a/services/surfaceflinger/SurfaceFlinger.cpp
++++ b/services/surfaceflinger/SurfaceFlinger.cpp
+@@ -104,6 +104,11 @@ SurfaceFlinger::SurfaceFlinger()
+     init();
+ }
+ 
++void SurfaceFlinger::set_display_ptr(void *ptr)
++{
++	display_ptr = ptr;
++}
++
+ void SurfaceFlinger::init()
+ {
+     LOGI("SurfaceFlinger is starting");
+diff --git a/services/surfaceflinger/SurfaceFlinger.h b/services/surfaceflinger/SurfaceFlinger.h
+index 17b80a6..4cb1491 100644
+--- a/services/surfaceflinger/SurfaceFlinger.h
++++ b/services/surfaceflinger/SurfaceFlinger.h
+@@ -144,6 +144,8 @@ enum {
+     eTraversalNeeded        = 0x02
+ };
+ 
++extern void *display_ptr;
++
+ class SurfaceFlinger :
+         public BinderService<SurfaceFlinger>,
+         public BnSurfaceComposer,
+@@ -151,6 +153,7 @@ class SurfaceFlinger :
+         protected Thread
+ {
+ public:
++    static void set_display_ptr(void *ptr);
+     static char const* getServiceName() { return "SurfaceFlinger"; }
+ 
+                     SurfaceFlinger();

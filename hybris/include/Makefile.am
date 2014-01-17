@@ -61,6 +61,10 @@ camerainclude_HEADERS = \
 	hybris/camera/camera_compatibility_layer_configuration_translator.h \
 	hybris/camera/camera_compatibility_layer.h
 
+surfaceflingerincludedir = $(includedir)/hybris/surfaceflinger
+surfaceflingerinclude_HEADERS = \
+	hybris/surfaceflinger/surfaceflinger_compatibility_layer_capabilities.h
+
 propertiesincludedir = $(includedir)/hybris/properties
 propertiesinclude_HEADERS = \
 	hybris/properties/properties.h

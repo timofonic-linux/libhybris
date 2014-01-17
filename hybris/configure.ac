@@ -189,6 +189,8 @@ AC_CONFIG_FILES([
 	input/libis.pc
 	camera/Makefile
 	camera/libcamera.pc
+	surfaceflinger/Makefile
+	surfaceflinger/libsurfaceflinger.pc
 	include/Makefile
 	utils/Makefile
 	tests/Makefile
