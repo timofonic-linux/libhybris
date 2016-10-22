@@ -18,7 +18,9 @@ libhybris_common_la_SOURCES = \
 	strlcat.c \
 	logging.c \
 	sysconf.c \
-        pthread_helpers.cpp
+        pthread_helpers.cpp \
+	wrappers.c \
+	wrapper_code_generic_arm.c
 libhybris_common_la_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	$(ANDROID_HEADERS_CFLAGS) \
