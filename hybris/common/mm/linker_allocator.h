@@ -23,8 +23,10 @@
 #include <stddef.h>
 #include <unistd.h>
 
-#include <vector>
+#include <limits>
 
+#include <vector>
+#include <memory>
 #include "private/bionic_prctl.h"
 #include "private/libc_logging.h"
 
@@ -65,6 +67,12 @@ struct small_object_block_record {
 template <typename T>
 class linker_vector_allocator {
  public:
+  template<typename _Tp1>
+  struct rebind
+  {
+          typedef linker_vector_allocator<_Tp1> other;
+  };
+
   typedef T value_type;
   typedef T* pointer;
   typedef const T* const_pointer;
@@ -72,7 +80,6 @@ class linker_vector_allocator {
   typedef const T& const_reference;
   typedef size_t size_type;
   typedef ptrdiff_t difference_type;
-
   T* allocate(size_t n, const T* hint = nullptr) {
     size_t size = n * sizeof(T);
     void* ptr = mmap(const_cast<T*>(hint), size,
@@ -91,6 +98,16 @@ class linker_vector_allocator {
   void deallocate(T* ptr, size_t n) {
     munmap(ptr, n * sizeof(T));
   }
+
+  void construct(linker_vector_allocator::pointer p, linker_vector_allocator::const_reference t) {
+    new ((void*)p) T(t);
+  }
+
+  void destroy(linker_vector_allocator::pointer p){ ((T*)p)->~T(); }
+
+  size_type max_size() const {
+        return std::numeric_limits<size_type>::max() / sizeof(T);
+    }
 };
 
 typedef
@@ -106,6 +123,7 @@ class LinkerSmallObjectAllocator {
   void free(void* ptr);
 
   size_t get_block_size() const { return block_size_; }
+
  private:
   void alloc_page();
   void free_page(linker_vector_t::iterator page_record);

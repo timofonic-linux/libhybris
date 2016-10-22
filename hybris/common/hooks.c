@@ -27,8 +27,10 @@
 #include <stdio_ext.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <malloc.h>
 #include <string.h>
+#include <inttypes.h>
 #include <strings.h>
 #include <dlfcn.h>
 #include <pthread.h>
@@ -39,10 +41,20 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <stdarg.h>
+#include <wchar.h>
+#include <sched.h>
+#include <pwd.h>
+#include <signal.h>
+#include <setjmp.h>
+#include <sys/signalfd.h>
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <fcntl.h>
+
+#include <linux/futex.h>
+#include <sys/syscall.h>
+#include <sys/time.h>
 
 #include <netdb.h>
 #include <unistd.h>
@@ -50,6 +62,11 @@
 #include <locale.h>
 #include <sys/syscall.h>
 #include <sys/auxv.h>
+#include <sys/prctl.h>
+
+#include <sys/mman.h>
+#include <libgen.h>
+#include <mntent.h>
 
 #include <hybris/properties/properties.h>
 
@@ -153,6 +170,20 @@ static pthread_rwlock_t* hybris_alloc_init_rwlock(void)
     pthread_rwlockattr_init(&attr);
     pthread_rwlock_init(realrwlock, &attr);
     return realrwlock;
+}
+
+int my_pthread_rwlockattr_setkind_np(pthread_rwlockattr_t *attr, int pref)
+{
+    pthread_rwlockattr_t *realattr = (pthread_rwlockattr_t *) *(uintptr_t *) attr;
+
+    return pthread_rwlockattr_setkind_np(realattr, pref);
+}
+
+int my_pthread_rwlockattr_getkind_np(const pthread_rwlockattr_t *attr, int *pref)
+{
+    pthread_rwlockattr_t *realattr = (pthread_rwlockattr_t *) *(uintptr_t *) attr;
+
+    return pthread_rwlockattr_getkind_np(realattr, pref);
 }
 
 /*
@@ -1403,6 +1434,9 @@ void *__get_tls_hooks()
   return tls_hooks;
 }
 
+extern size_t strlcat(char *dst, const char *src, size_t siz);
+extern size_t strlcpy(char *dst, const char *src, size_t siz);
+
 static struct _hook hooks[] = {
     {"property_get", property_get },
     {"property_set", property_set },
@@ -1452,8 +1486,8 @@ static struct _hook hooks[] = {
     {"strncmp",strncmp},
     {"strncpy",strncpy},
     {"strtod", my_strtod},
-    //{"strlcat",strlcat},
-    //{"strlcpy",strlcpy},
+    {"strlcat",strlcat},
+    {"strlcpy",strlcpy},
     {"strcspn",strcspn},
     {"strpbrk",strpbrk},
     {"strsep",strsep},
@@ -1670,6 +1704,110 @@ static struct _hook hooks[] = {
     {NULL, NULL},
 };
 
+static struct _hook hooks_mm[] = {
+    {"strtol", strtol},
+    {"strlcat",strlcat},
+    {"strlcpy",strlcpy},
+    {"setenv", setenv},
+    {"putenv", putenv},
+    {"clearenv", clearenv},
+    {"dprintf", dprintf},
+    {"mallinfo", mallinfo},
+    {"malloc_usable_size", malloc_usable_size},
+    {"posix_memalign", posix_memalign},
+    {"mprotect", mprotect},
+    {"__gnu_strerror_r", strerror_r},
+    {"pthread_rwlockattr_getkind_np", my_pthread_rwlockattr_getkind_np},
+    {"pthread_rwlockattr_setkind_np", my_pthread_rwlockattr_setkind_np},
+    /* unistd.h */
+    {"fork", fork},
+    {"ttyname", ttyname},
+    {"swprintf", swprintf},
+    {"fmemopen", fmemopen},
+    {"open_memstream", open_memstream},
+    {"open_wmemstream", open_wmemstream},
+    {"ptsname", ptsname},
+    {"getservbyname", getservbyname},
+    /* libgen.h */
+    {"basename", basename},
+    {"dirname", dirname},
+    /* locale.h */
+    {"newlocale", newlocale},
+    {"freelocale", freelocale},
+    {"duplocale", duplocale},
+    {"uselocale", uselocale},
+    {"localeconv", localeconv},
+    {"setlocale", setlocale},
+    /* sys/mman.h */
+    {"mmap", mmap},
+    {"munmap", munmap},
+    /* wchar.h */
+    {"wmemchr", wmemchr},
+    {"wmemcmp", wmemcmp},
+    {"wmemcpy", wmemcpy},
+    {"wmemmove", wmemmove},
+    {"wmemset", wmemset},
+    {"wmempcpy", wmempcpy},
+    {"fputws", fputws},
+    // It's enough to hook vfwprintf here as fwprintf will call it with a
+    // proper va_list in place so we don't have to handle this here.
+    {"vfwprintf", vfwprintf},
+    {"fputwc", fputwc},
+    {"putwc", putwc},
+    {"fgetwc", fgetwc},
+    {"getwc", getwc},
+    /* sched.h */
+    {"clone", clone},
+    /* mntent.h */
+    {"setmntent", setmntent},
+    {"getmntent", getmntent},
+    {"getmntent_r", getmntent_r},
+    {"endmntent", endmntent},
+    /* stdlib.h */
+    {"system", system},
+    /* pwd.h */
+    {"getgrnam", getgrnam},
+    {"getpwuid", getpwuid},
+    {"getpwnam", getpwnam},
+    /* signal.h */
+    /* Hooks commented out for the moment as we need proper translations between
+     * bionic and glibc types for them to work (for instance, sigset_t has
+     * different definitions in each library).
+     */
+#if 0
+    {"sigaction", sigaction},
+    {"sigaddset", sigaddset},
+    {"sigaltstack", sigaltstack},
+    {"sigblock", sigblock},
+    {"sigdelset", sigdelset},
+    {"sigemptyset", sigemptyset},
+    {"sigfillset", sigfillset},
+    {"siginterrupt", siginterrupt},
+    {"sigismember", sigismember},
+    {"siglongjmp", siglongjmp},
+    {"signal", signal},
+    {"signalfd", signalfd},
+    {"sigpending", sigpending},
+    {"sigprocmask", sigprocmask},
+    {"sigqueue", sigqueue},
+    // setjmp.h defines segsetjmp via a #define and the real symbol
+    // we have to forward to is __sigsetjmp
+    {"sigsetjmp", __sigsetjmp},
+    {"sigsetmask", sigsetmask},
+    {"sigsuspend", sigsuspend},
+    {"sigtimedwait", sigtimedwait},
+    {"sigwait", sigwait},
+    {"sigwaitinfo", sigwaitinfo},
+#endif
+    /* dirent.h */
+    {"readdir64", my_readdir},
+    {"readdir64_r", my_readdir_r},
+    {"alphasort,", alphasort},
+    {"versionsort,", versionsort},
+    {"scandir64", my_scandir},
+    {NULL, NULL},
+};
+
 void *get_hooked_symbol(char *sym)
 {
     struct _hook *ptr = &hooks[0];
@@ -1682,6 +1820,17 @@ void *get_hooked_symbol(char *sym)
         }
         ptr++;
     }
+
+    ptr = &hooks_mm[0];
+
+    while (ptr->name != NULL)
+    {
+        if (strcmp(sym, ptr->name) == 0){
+            return ptr->func;
+        }
+        ptr++;
+    }
+
     if (strstr(sym, "pthread") != NULL)
     {
         /* safe */

@@ -40,6 +40,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
+#include <sys/syscall.h>
 
 extern "C" int tgkill(int tgid, int tid, int sig);
 
@@ -70,6 +71,11 @@ struct __attribute__((packed)) debugger_msg_t {
 
 // see man(2) prctl, specifically the section about PR_GET_NAME
 #define MAX_TASK_NAME_LEN (16)
+
+static pid_t gettid(void)
+{
+    return syscall(__NR_gettid);
+}
 
 static int socket_abstract_client(const char* name, int type) {
   sockaddr_un addr;
@@ -293,7 +299,7 @@ static void debuggerd_signal_handler(int signal_number, siginfo_t* info, void*) 
   }
 }
 
-__LIBC_HIDDEN__ void debuggerd_init() {
+void debuggerd_init() {
   struct sigaction action;
   memset(&action, 0, sizeof(action));
   sigemptyset(&action.sa_mask);
