@@ -63,6 +63,8 @@
 
 #include "hybris_compat.h"
 
+#include "../wrappers.h"
+
 extern "C" void *get_hooked_symbol(const char *symbol);
 
 int g_ld_debug_stdout = 0;
@@ -1987,6 +1989,26 @@ bool soinfo::relocate(const VersionTracker& version_tracker, ElfRelIteratorT&& r
           return false;
         }
       }
+      else
+      {
+        // TODO: this will be slower.
+        if (!lookup_version_info(version_tracker, sym, sym_name, &vi)) {
+          return false;
+        }
+
+        if (!soinfo_do_lookup(this, sym_name, vi, &lsi, global_group, local_group, &s)) {
+          return false;
+        }
+
+        switch(ELF_ST_TYPE(s->st_info))
+        {
+          case STT_FUNC:
+          case STT_GNU_IFUNC:
+          case STT_ARM_TFUNC:
+            sym_addr = (ElfW(Addr))create_wrapper(sym_name, (void*)sym_addr, WRAPPER_HOOKED);
+            break;
+        }
+      }
 
       if(sym_addr == 0 && s == nullptr) {
         // We only allow an undefined symbol if this is a weak reference...
@@ -2060,7 +2082,20 @@ bool soinfo::relocate(const VersionTracker& version_tracker, ElfRelIteratorT&& r
           }
         }
 #endif
-        sym_addr = lsi->resolve_symbol_address(s);
+
+        switch(ELF_ST_TYPE(s->st_info))
+        {
+          case STT_FUNC:
+          case STT_GNU_IFUNC:
+          case STT_ARM_TFUNC:
+            sym_addr = (ElfW(Addr))create_wrapper(sym_name,
+                    (void*)lsi->resolve_symbol_address(s), WRAPPER_UNHOOKED);
+            break;
+          default:
+            sym_addr = lsi->resolve_symbol_address(s);
+            break;
+        }
+
 #if !defined(__LP64__)
         if (protect_segments) {
           if (phdr_table_unprotect_segments(phdr, phnum, load_bias) < 0) {

@@ -31,7 +31,9 @@ libhybris_common_la_SOURCES = \
 	strlcat.c \
 	dlfcn.c \
 	logging.c \
-	sysconf.c
+	sysconf.c \
+	wrappers.c \
+	wrapper_code_generic_arm.c
 libhybris_common_la_CFLAGS = \
 	-I$(top_srcdir)/include \
 	$(ANDROID_HEADERS_CFLAGS) \
