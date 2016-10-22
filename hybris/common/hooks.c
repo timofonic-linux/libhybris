@@ -1685,7 +1685,7 @@ void *get_hooked_symbol(char *sym)
     if (strstr(sym, "pthread") != NULL)
     {
         /* safe */
-        if (strcmp(sym, "pthread_sigmask") == 0)
+        if (strcmp(sym, "pthread_sigmask") == 0 || strstr(sym, "android") != NULL)
            return NULL;
         /* not safe */
         counter--;
