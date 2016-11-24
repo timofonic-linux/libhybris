@@ -2579,8 +2579,10 @@ static struct _hook hooks_common[] = {
     HOOK_INDIRECT(putw),
     HOOK_INDIRECT(setbuffer),
     HOOK_INDIRECT(setlinebuf),
+    /* errno.h */
     HOOK_TO(__errno, __errno_location),
     HOOK_INDIRECT(__set_errno),
+    HOOK_TO(__progname, &program_invocation_name),
     /* net specifics, to avoid __res_get_state */
     HOOK_INDIRECT(getaddrinfo),
     HOOK_INDIRECT(freeaddrinfo),
