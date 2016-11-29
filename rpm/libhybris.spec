@@ -469,14 +469,10 @@ rm %{buildroot}/%{_libdir}/*.la %{buildroot}/%{_libdir}/libhybris/*.la
 %{_libdir}/libui.so
 %{_libdir}/libui.so.1
 %{_libdir}/libui.so.1.0.0
-%{_libdir}/libwifi.so
-%{_libdir}/libwifi.so.1
-%{_libdir}/libwifi.so.1.0.0
 %{_libdir}/pkgconfig/libcamera.pc
 %{_libdir}/pkgconfig/libis.pc
 %{_libdir}/pkgconfig/libmedia.pc
 %{_libdir}/pkgconfig/libsf.pc
-%{_libdir}/pkgconfig/libwifi.pc
 %ifnarch aarch64
   %{_libdir}/libhybris/linker/jb.la
   %{_libdir}/libhybris/linker/jb.so
