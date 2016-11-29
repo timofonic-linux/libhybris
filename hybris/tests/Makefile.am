@@ -4,12 +4,8 @@ bin_PROGRAMS = \
 	test_egl_configs \
 	test_glesv2 \
 	test_sensors \
-	test_input \
 	test_lights \
-	test_camera \
 	test_vibrator \
-	test_media \
-	test_recorder \
 	test_gps
 
 if HAS_ANDROID_4_2_0

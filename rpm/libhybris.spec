@@ -452,26 +452,7 @@ rm %{buildroot}/%{_libdir}/*.la %{buildroot}/%{_libdir}/libhybris/*.la
 %{_includedir}/hybris/media/media_recorder_layer.h
 %{_includedir}/hybris/media/recorder_compatibility_layer.h
 %{_includedir}/hybris/media/surface_texture_client_hybris.h
-%{_libdir}/libcamera.so
-%{_libdir}/libcamera.so.1
-%{_libdir}/libcamera.so.1.0.0
 %{_libdir}/libhybris/linker/jb.so
-%{_libdir}/libis.so
-%{_libdir}/libis.so.1
-%{_libdir}/libis.so.1.0.0
-%{_libdir}/libmedia.so
-%{_libdir}/libmedia.so.1
-%{_libdir}/libmedia.so.1.0.0
-%{_libdir}/libsf.so
-%{_libdir}/libsf.so.1
-%{_libdir}/libsf.so.1.0.0
-%{_libdir}/libui.so
-%{_libdir}/libui.so.1
-%{_libdir}/libui.so.1.0.0
-%{_libdir}/pkgconfig/libcamera.pc
-%{_libdir}/pkgconfig/libis.pc
-%{_libdir}/pkgconfig/libmedia.pc
-%{_libdir}/pkgconfig/libsf.pc
 %ifnarch aarch64
   %{_libdir}/libhybris/linker/jb.la
   %{_libdir}/libhybris/linker/jb.so
