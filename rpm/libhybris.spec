@@ -253,7 +253,6 @@ autoreconf -v -f -i
   %{!?qa_stage_devel:--enable-debug} \
   %{!?qa_stage_devel:--enable-trace} \
   --with-android-headers=/usr/lib/droid-devel/droid-headers \
-  --enable-experimental \
 %ifarch %{arm}
   --enable-arch=arm \
   --with-default-hybris-ld-library-path=/usr/libexec/droid-hybris/system/lib:/vendor/lib:/system/lib \
