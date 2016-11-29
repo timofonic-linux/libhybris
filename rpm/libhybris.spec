@@ -455,8 +455,7 @@ rm %{buildroot}/%{_libdir}/*.la %{buildroot}/%{_libdir}/libhybris/*.la
 %{_libdir}/libcamera.so
 %{_libdir}/libcamera.so.1
 %{_libdir}/libcamera.so.1.0.0
-%{_libdir}/libhybris/linker/mm.la
-%{_libdir}/libhybris/linker/mm.so
+%{_libdir}/libhybris/linker/jb.so
 %{_libdir}/libis.so
 %{_libdir}/libis.so.1
 %{_libdir}/libis.so.1.0.0
