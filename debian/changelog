@@ -1,3 +1,25 @@
+libhybris (0.1.0+git20151016+6d424c9-0ubuntu24) zesty; urgency=medium
+
+  [ Kevin DuBois ]
+  * plumb through a lot of the makefiles for the mir platform
+  * egl: add a mir platform to the list of available hybris platforms
+  * add mir platform
+  * cleanups
+  * make sure that the current way mir works still works
+  * some internal cleanups
+  * rework mir platform so that there autodetection is cleaner
+  * debian rules
+  * cleanup other platforms
+  * undo unneeded add
+  * whitespace
+  * make wayland compile again
+  * put the appropriate copyright header in
+  * cleanup compiler warnings
+  * make sure to include mirclient in control
+  * header location changes for actual mir 0.26.1 pkg
+
+ -- Simon Fels <simon.fels@canonical.com>  Tue, 14 Feb 2017 18:49:33 +0100
+
 libhybris (0.1.0+git20151016+6d424c9-0ubuntu23) yakkety; urgency=medium
 
   [ You-Sheng Yang ]
