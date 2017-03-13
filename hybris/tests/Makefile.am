@@ -10,7 +10,6 @@ bin_PROGRAMS = \
 	test_vibrator \
 	test_media \
 	test_recorder \
-	test_gps \
 	test_sf
 
 if HAS_ANDROID_4_2_0
