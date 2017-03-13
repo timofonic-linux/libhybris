@@ -257,8 +257,6 @@ AC_CONFIG_FILES([
 	vibrator/libvibrator.pc
 	media/Makefile
 	media/libmedia.pc
-	wifi/Makefile
-	wifi/libwifi.pc
 	include/Makefile
 	input/Makefile
 	input/libis.pc
