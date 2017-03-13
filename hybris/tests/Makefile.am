@@ -11,7 +11,7 @@ bin_PROGRAMS = \
 	test_media \
 	test_recorder \
 	test_gps \
-	test_wifi
+	test_sf
 
 if HAS_ANDROID_4_2_0
 bin_PROGRAMS += test_hwcomposer
@@ -180,14 +180,6 @@ test_recorder_LDADD = \
 	$(top_builddir)/input/libis.la \
 	$(top_builddir)/sf/libsf.la
 
-test_gps_SOURCES = test_gps.c
-test_gps_CFLAGS = \
-	-I$(top_srcdir)/include \
-	$(ANDROID_HEADERS_CFLAGS)
-test_gps_LDFLAGS = -pthread
-test_gps_LDADD =  \
-	$(top_builddir)/common/libhybris-common.la \
-	$(top_builddir)/hardware/libhardware.la
 
 test_nfc_SOURCES = test_nfc.c
 test_nfc_CFLAGS = \
@@ -208,10 +200,4 @@ test_vibrator_LDADD = \
 	$(top_builddir)/common/libhybris-common.la \
 	$(top_builddir)/vibrator/libvibrator.la
 
-test_wifi_SOURCES = test_wifi.c
-test_wifi_CFLAGS = \
-	-I$(top_srcdir)/include \
-	$(ANDROID_HEADERS_CFLAGS)
-test_wifi_LDADD = \
-	$(top_builddir)/wifi/libwifi.la
 
