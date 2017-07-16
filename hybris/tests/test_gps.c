@@ -267,6 +267,41 @@ static pthread_t create_thread_callback(const char* name, void (*start)(void *),
   return thread_id;
 }
 
+#if ANDROID_VERSION_MAJOR >= 5
+static void request_utc_time_callback()
+{
+  fprintf(stdout, "*** gps_request_utc_time\n");
+  /* do nothing */
+}
+#endif
+
+#if ANDROID_VERSION_MAJOR >= 7
+static void sv_status_gnss_callback(GnssSvStatus* sv_info)
+{
+  int i = 0;
+
+  fprintf(stdout, "*** sv status gnss\n");
+  fprintf(stdout, "sv_size:\t%zu\n", sv_info->size);
+  fprintf(stdout, "num_svs:\t%d\n", sv_info->num_svs);
+  for(i=0; i < sv_info->num_svs; i++)
+  {
+        fprintf(stdout, "\t azimuth:\t%f\n", sv_info->gnss_sv_list[i].azimuth);
+        fprintf(stdout, "\t elevation:\t%f\n", sv_info->gnss_sv_list[i].elevation);
+       /* if prn > 65 and <= 88 this is a glonass sattelite */
+        fprintf(stdout, "\t svid:\t%d\n", sv_info->gnss_sv_list[i].svid);
+        fprintf(stdout, "\t size:\t%zu\n", sv_info->gnss_sv_list[i].size);
+        fprintf(stdout, "\t c_n0_dbhz:\t%f\n", sv_info->gnss_sv_list[i].c_n0_dbhz);
+  }
+}
+
+static void set_system_info_callback(const GnssSystemInfo* info)
+{
+  fprintf(stdout, "*** set_system_info\n");
+  fprintf(stdout, "year_of_hw: %u\n", info->year_of_hw);
+  /* do nothing */
+}
+#endif
+
 static void agps_handle_status_callback(AGpsStatus *status)
 {
   if(status->type)
@@ -357,6 +392,13 @@ GpsCallbacks callbacks = {
   acquire_wakelock_callback,
   release_wakelock_callback,
   create_thread_callback,
+#if ANDROID_VERSION_MAJOR >= 5
+  request_utc_time_callback,
+#endif
+#if ANDROID_VERSION_MAJOR >= 7
+  sv_status_gnss_callback,
+  set_system_info_callback
+#endif
 };
 
 AGpsCallbacks callbacks2 = {
