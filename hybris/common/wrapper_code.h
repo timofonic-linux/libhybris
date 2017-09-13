@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Simon Busch <morphis@gravedo.de>
+ * Copyright (c) 2017 Franz-Josef Haider <f_haider@gmx.at>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,17 @@
  *
  */
 
-#include <dlfcn.h>
-#include <stddef.h>
-#include <errno.h>
-#include <hardware/hardware.h>
-#include <hybris/common/binding.h>
+#ifndef WRAPPER_CODE_H
+#define WRAPPER_CODE_H
 
-#pragma GCC visibility push(hidden)
-HYBRIS_LIBRARY_INITIALIZE(hardware, "/system/lib/libhardware.so");
-#pragma GCC visibility pop
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-HYBRIS_IMPLEMENT_FUNCTION2(hardware, int, hw_get_module, const char *, const struct hw_module_t **);
-HYBRIS_IMPLEMENT_FUNCTION3(hardware, int, hw_get_module_by_class, const char *, const char *, const struct hw_module_t **);
+void wrapper_code_generic() __attribute__((naked,noinline));
 
-// vim:ts=4:sw=4:noexpandtab
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* WRAPPER_CODE_H */

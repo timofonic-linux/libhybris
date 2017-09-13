@@ -54,6 +54,12 @@ AC_ARG_ENABLE(trace,
   [trace="no"])
 AM_CONDITIONAL( [WANT_TRACE], [test x"$trace" = x"yes"])
 
+AC_ARG_ENABLE(mm_arm_tracing,
+  [  --enable-mm-arm-tracing            Enable ARM (32-bit only) tracing, useful for understanding what the blob is doing, currently only the mm linker is supported. (default=disabled)],
+  [mm_arm_tracing=$enableval],
+  [mm_arm_tracing="no"])
+AM_CONDITIONAL([WANT_ARM_TRACING], [test x"$mm_arm_tracing" = x"yes"])
+
 AC_ARG_ENABLE(mesa,
   [  --enable-mesa            Enable mesa headers (default=disabled)],
   [mesa=$enableval],
@@ -216,6 +222,7 @@ AC_MSG_NOTICE("Android headers version is $android_headers_major.$android_header
 AM_CONDITIONAL([HAS_ANDROID_5_0_0], [test $android_headers_major -ge 5 -a $android_headers_minor -ge 0 ])
 AM_CONDITIONAL([HAS_ANDROID_4_2_0], [test $android_headers_major -ge 4 -a $android_headers_minor -ge 2 ])
 AM_CONDITIONAL([HAS_ANDROID_4_1_0], [test $android_headers_major -ge 4 -a $android_headers_minor -ge 1 ])
+AM_CONDITIONAL([HAS_ANDROID_4_0_3], [test $android_headers_major -ge 4 -a $android_headers_patch -ge 3 ])
 AM_CONDITIONAL([HAS_ANDROID_4_0_0], [test $android_headers_major -ge 4 -a $android_headers_minor -ge 0 ])
 AM_CONDITIONAL([HAS_ANDROID_2_3_0], [test $android_headers_major -ge 2 -a $android_headers_minor -ge 3 ])
 
@@ -235,6 +242,8 @@ AC_CONFIG_FILES([
 	Makefile
 	properties/Makefile
 	properties/libandroid-properties.pc
+	camera/Makefile
+	camera/libcamera.pc
 	common/Makefile
 	common/jb/Makefile
 	common/stub/Makefile
@@ -262,13 +271,6 @@ AC_CONFIG_FILES([
 	libnfc_ndef_nxp/libnfc_ndef_nxp.pc
 	libsync/Makefile
 	libsync/libsync.pc
-	ui/Makefile
-	sf/Makefile
-	sf/libsf.pc
-	input/Makefile
-	input/libis.pc
-	camera/Makefile
-	camera/libcamera.pc
 	vibrator/Makefile
 	vibrator/libvibrator.pc
 	media/Makefile
@@ -276,7 +278,12 @@ AC_CONFIG_FILES([
 	wifi/Makefile
 	wifi/libwifi.pc
 	include/Makefile
+	input/Makefile
+	input/libis.pc
+	ui/Makefile
 	utils/Makefile
+	sf/Makefile
+	sf/libsf.pc
 	tests/Makefile
 ])
 
