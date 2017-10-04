@@ -48,6 +48,7 @@
 #include <signal.h>
 #include <setjmp.h>
 #include <sys/signalfd.h>
+#include <sys/uio.h>
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -292,6 +293,10 @@ static pthread_rwlock_t* hybris_alloc_init_rwlock(void)
 static void *_hybris_hook_malloc(size_t size)
 {
     TRACE_HOOK("size %zu", size);
+
+#ifdef WANT_ADRENO_QUIRKS
+    if(size == 4) size = 5;
+#endif
 
     void *res = malloc(size);
 
@@ -2424,6 +2429,10 @@ static const char *_hybris_hook_dlerror(void)
     return android_dlerror();
 }
 
+#if !defined(cfree)
+#define cfree free
+#endif
+
 static struct _hook hooks_common[] = {
 
     HOOK_DIRECT(property_get),
@@ -2431,7 +2440,7 @@ static struct _hook hooks_common[] = {
     HOOK_INDIRECT(__system_property_get),
     HOOK_DIRECT(getenv),
     HOOK_DIRECT_NO_DEBUG(printf),
-    HOOK_DIRECT(malloc),
+    HOOK_INDIRECT(malloc),
     HOOK_DIRECT_NO_DEBUG(free),
     HOOK_DIRECT_NO_DEBUG(calloc),
     HOOK_DIRECT_NO_DEBUG(cfree),
@@ -2956,7 +2965,7 @@ static void __hybris_linker_init()
      * an overview over available SDK version numbers and which
      * Android version they relate to. */
 #if defined(WANT_LINKER_MM)
-    if (sdk_version <= 23)
+    if (sdk_version <= 25)
         name = LINKER_NAME_MM;
 #endif
 #if defined(WANT_LINKER_JB)
