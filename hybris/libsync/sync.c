@@ -27,6 +27,7 @@
 #include <linux/sync.h>
 #include <linux/sw_sync.h>
 #else
+#include <sys/cdefs.h>
 #include <sync/sync.h>
 #endif
 
